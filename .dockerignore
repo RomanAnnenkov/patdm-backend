@@ -1,0 +1,6 @@
+**/.idea/
+*.md
+*.log
+**/target/
+**/logs/
+**/storage/
