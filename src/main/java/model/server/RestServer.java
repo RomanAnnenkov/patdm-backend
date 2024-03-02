@@ -13,13 +13,14 @@ import model.elementColorsLoader.DMCElementColors;
 import model.elementColorsLoader.IMosaicElementColorLoader;
 import model.image.Image;
 import model.palette.Palette;
+import model.server.request.RequestFile;
+import model.server.response.ResponseFile;
+import model.server.response.ResponseFileList;
 import model.tableMap.AlphabeticSymbols;
 import model.tableMap.ITableMap;
 import model.tableMap.TableMap;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,9 +35,11 @@ public class RestServer {
         return true;
     }
 
-    @GetMapping("/process-file")
-    public List<String> processPng(@RequestParam(value = "filePath", defaultValue = "storage/client_1/sen.png") String filePath) throws ImageIsNotPNGExceptions, IOException, DocumentException, MosaicIsTooBigException {
-        List<String> generatedFiles = new ArrayList<>();
+    @PostMapping(value = "/process-file", headers = "content-type=application/json")
+    public ResponseFileList processPng(@RequestBody RequestFile file) throws ImageIsNotPNGExceptions, IOException, DocumentException, MosaicIsTooBigException {
+        String filePath = file.getFilePath();
+        System.out.println(filePath);
+        ResponseFileList responseFileList = new ResponseFileList();
 
         ImageLoader loader = new ImageLoader();
         Image image = loader.loadImage(filePath);
@@ -46,7 +49,7 @@ public class RestServer {
         ImagePreserver imagePreserver = new ImagePreserver();
         PathGenerator pathGenerator = new PathGenerator(filePath);
         imagePreserver.saveImage(resizedImage, pathGenerator.getPath("resized", "png"));
-        generatedFiles.add(pathGenerator.getPath("resized", "png"));
+        responseFileList.add(new ResponseFile("resized", pathGenerator.getPath("resized", "png")));
 
         IMosaicElementColorLoader mosaicElementColorLoader = DMCElementColors.getInstance();
         IImagePixelColorsToElementColors colorConverter = new ImagePixelColorsToElementColors(new PixelColorToElementColor(), mosaicElementColorLoader);
@@ -55,20 +58,20 @@ public class RestServer {
         Palette palette = new Palette(new AlphabeticSymbols(), resizedImage);
 
         imagePreserver.saveImage(palette.generatePreview(), pathGenerator.getPath("preview", "png"));
-        generatedFiles.add(pathGenerator.getPath("preview", "png"));
+        responseFileList.add(new ResponseFile("preview", pathGenerator.getPath("preview", "png")));
 
         PDFPalettePreserver pdfPalettePreserver = new PDFPalettePreserver(palette);
         pdfPalettePreserver.savePDF(pathGenerator.getPath("palette", "pdf"));
-        generatedFiles.add(pathGenerator.getPath("palette", "pdf"));
+        responseFileList.add(new ResponseFile("palette", pathGenerator.getPath("palette", "pdf")));
 
         ITableMap tableMap = new TableMap(palette);
         String[][] forPrint = tableMap.getTableMap();
 
         PDFMapPreserver pdfMapPreserver = new PDFMapPreserver(forPrint);
         pdfMapPreserver.savePDF(pathGenerator.getPath("map", "pdf"));
-        generatedFiles.add(pathGenerator.getPath("map", "pdf"));
+        responseFileList.add(new ResponseFile("map", pathGenerator.getPath("map", "pdf")));
 
-        return generatedFiles;
+        return responseFileList;
     }
 
 }
