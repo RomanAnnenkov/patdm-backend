@@ -20,6 +20,7 @@ import model.tableMap.AlphabeticSymbols;
 import model.tableMap.ITableMap;
 import model.tableMap.TableMap;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -31,14 +32,13 @@ import java.util.List;
 public class RestServer {
 
     @GetMapping("/health-check")
-    public boolean healthCheck() {
-        return true;
+    public HttpStatus healthCheck() {
+        return HttpStatus.OK;
     }
 
     @PostMapping(value = "/process-file", headers = "content-type=application/json")
     public ResponseFileList processPng(@RequestBody RequestFile file) throws ImageIsNotPNGExceptions, IOException, DocumentException, MosaicIsTooBigException {
         String filePath = file.getFilePath();
-        System.out.println(filePath);
         ResponseFileList responseFileList = new ResponseFileList();
 
         ImageLoader loader = new ImageLoader();
