@@ -76,7 +76,7 @@ public class PDFMapPreserver implements IPDFPreserver {
         if (wideInElement <= 368 && heightInElement <= 526) {
             return PageSize.A0;
         }
-        throw new MosaicIsTooBigException("need format more than A0");
+        throw new MosaicIsTooBigException("Processing error, too many elements, max size of an pdf map 368x526 elements.");
     }
 
 }

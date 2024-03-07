@@ -1,6 +1,9 @@
 **/.idea/
+**/.git/
+.gitignore
 *.md
 *.log
 **/target/
 **/logs/
 **/storage/
+
