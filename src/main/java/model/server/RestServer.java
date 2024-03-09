@@ -17,6 +17,8 @@ import model.server.request.RequestFile;
 import model.tableMap.AlphabeticSymbols;
 import model.tableMap.ITableMap;
 import model.tableMap.TableMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +30,7 @@ import java.util.Map;
 @RestController
 @EnableAutoConfiguration
 public class RestServer {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @GetMapping("/health-check")
     public HttpStatus healthCheck() {
@@ -37,7 +40,8 @@ public class RestServer {
     @PostMapping(value = "/process-file", headers = "content-type=application/json")
     public Map<String, String> processPng(@RequestBody RequestFile file) throws ImageIsNotPNGExceptions, IOException, DocumentException, MosaicIsTooBigException {
         String filePath = file.getFilePath();
-        Map<String,String> responseFiles = new HashMap<>();
+        logger.info("Start processing: " + filePath);
+        Map<String, String> responseFiles = new HashMap<>();
 
         ImageLoader loader = new ImageLoader();
         Image image = loader.loadImage(filePath);
@@ -46,8 +50,10 @@ public class RestServer {
         Image resizedImage = converterSize.decrease(image);
         ImagePreserver imagePreserver = new ImagePreserver();
         PathGenerator pathGenerator = new PathGenerator(filePath);
-        imagePreserver.saveImage(resizedImage, pathGenerator.getPath("resized", "png"));
-        responseFiles.put("resized", pathGenerator.getPath("resized", "png"));
+        String resizedFileOutput = pathGenerator.getPath("resized", "png");
+        imagePreserver.saveImage(resizedImage, resizedFileOutput);
+        responseFiles.put("resized", resizedFileOutput);
+        logger.info("Generated resized file: " + resizedFileOutput);
 
         IMosaicElementColorLoader mosaicElementColorLoader = DMCElementColors.getInstance();
         IImagePixelColorsToElementColors colorConverter = new ImagePixelColorsToElementColors(new PixelColorToElementColor(), mosaicElementColorLoader);
@@ -55,19 +61,27 @@ public class RestServer {
 
         Palette palette = new Palette(new AlphabeticSymbols(), resizedImage);
 
-        imagePreserver.saveImage(palette.generatePreview(), pathGenerator.getPath("preview", "png"));
-        responseFiles.put("preview", pathGenerator.getPath("preview", "png"));
+        String previewFileOutput = pathGenerator.getPath("preview", "png");
+        imagePreserver.saveImage(palette.generatePreview(), previewFileOutput);
+        responseFiles.put("preview", previewFileOutput);
+        logger.info("Generated preview file: " + previewFileOutput);
 
         PDFPalettePreserver pdfPalettePreserver = new PDFPalettePreserver(palette);
-        pdfPalettePreserver.savePDF(pathGenerator.getPath("palette", "pdf"));
-        responseFiles.put("palette", pathGenerator.getPath("palette", "pdf"));
+        String paletteOutputFile = pathGenerator.getPath("palette", "pdf");
+        pdfPalettePreserver.savePDF(paletteOutputFile);
+        responseFiles.put("palette", paletteOutputFile);
+        logger.info("Generated palette file: " + paletteOutputFile);
 
         ITableMap tableMap = new TableMap(palette);
-        String[][] forPrint = tableMap.getTableMap();
+        String[][] tableMapForSave = tableMap.getTableMap();
 
-        PDFMapPreserver pdfMapPreserver = new PDFMapPreserver(forPrint);
-        pdfMapPreserver.savePDF(pathGenerator.getPath("map", "pdf"));
-        responseFiles.put("map", pathGenerator.getPath("map", "pdf"));
+        PDFMapPreserver pdfMapPreserver = new PDFMapPreserver(tableMapForSave);
+        String mapOutputFile = pathGenerator.getPath("map", "pdf");
+        pdfMapPreserver.savePDF(mapOutputFile);
+        responseFiles.put("map", mapOutputFile);
+        logger.info("Generated map file: " + paletteOutputFile);
+
+        logger.info("End processing: " + filePath);
 
         return responseFiles;
     }
