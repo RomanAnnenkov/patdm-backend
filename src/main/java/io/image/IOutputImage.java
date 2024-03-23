@@ -4,6 +4,6 @@ import model.image.Image;
 
 import java.io.IOException;
 
-public interface IOutputImage {
+    public interface IOutputImage {
     void saveImage(Image image, String filePath) throws IOException;
 }

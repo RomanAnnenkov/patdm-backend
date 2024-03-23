@@ -1,5 +1,5 @@
 
-import model.server.RestServer;
+import controller.RestServer;
 import org.springframework.boot.SpringApplication;
 
 public class Main {

@@ -1,4 +1,4 @@
-package model.server;
+package controller;
 
 import com.itextpdf.text.DocumentException;
 import exceptions.ImageIsNotPNGExceptions;
@@ -13,7 +13,7 @@ import model.elementColorsLoader.DMCElementColors;
 import model.elementColorsLoader.IMosaicElementColorLoader;
 import model.image.Image;
 import model.palette.Palette;
-import model.server.request.RequestFile;
+import controller.request.RequestFile;
 import model.tableMap.AlphabeticSymbols;
 import model.tableMap.ITableMap;
 import model.tableMap.TableMap;

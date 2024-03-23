@@ -1,4 +1,4 @@
-package model.server.request;
+package controller.request;
 
 public class RequestFile {
     private String filePath;
