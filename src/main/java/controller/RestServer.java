@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -33,8 +34,8 @@ public class RestServer {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @GetMapping("/health-check")
-    public HttpStatus healthCheck() {
-        return HttpStatus.OK;
+    public ResponseEntity<Void> healthCheck() {
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping(value = "/process-file", headers = "content-type=application/json")
