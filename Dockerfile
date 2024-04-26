@@ -1,10 +1,10 @@
 FROM alpine:3.18 AS builder
-RUN apk update && apk --no-cache add openjdk17-jdk=17.0.10_p7-r0 maven=3.9.2-r0
+RUN apk update && apk --no-cache add openjdk17-jdk maven
 COPY . .
 RUN mvn package
 
 FROM alpine:3.18
-RUN apk update && apk --no-cache add openjdk17-jre=17.0.10_p7-r0 curl tzdata
+RUN apk update && apk --no-cache add openjdk17-jre curl tzdata
 ENV TZ=Europe/Moscow
 COPY --from=builder /target/*.jar /app/app.jar
 
