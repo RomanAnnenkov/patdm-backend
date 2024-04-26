@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>patdm-backend</artifactId>
+    <artifactId>patdm-converter</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -26,10 +26,6 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-        </dependency>
-        <dependency>
             <groupId>gov.nih.imagej</groupId>
             <artifactId>imagej</artifactId>
             <version>1.47</version>
@@ -42,15 +38,6 @@
     </dependencies>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.6.0</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
