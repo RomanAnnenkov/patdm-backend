@@ -3,6 +3,8 @@
 
     <property name="LOGS" value="./logs" />
 
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
     <appender name="RollingFile"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOGS}/patdm-converter.log</file>
